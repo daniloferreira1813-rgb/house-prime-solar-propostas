@@ -1,0 +1,708 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>House Prime Solar • Gerador de Proposta</title>
+
+  <style>
+    :root{
+      --bg:#0b1220;
+      --stroke: rgba(255,255,255,0.10);
+      --text: rgba(255,255,255,0.92);
+      --muted: rgba(255,255,255,0.65);
+      --brand:#FDBA18;
+      --brand2:#2EA7FF;
+    }
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      color:var(--text);
+      background:
+        radial-gradient(1100px 600px at 20% 10%, rgba(46,167,255,.18), transparent 55%),
+        radial-gradient(900px 600px at 85% 20%, rgba(253,186,24,.16), transparent 55%),
+        var(--bg);
+    }
+
+    .wrap{ max-width: 980px; margin: 0 auto; padding: 18px; }
+
+    .top{
+      display:flex; align-items:center; justify-content:space-between;
+      gap:12px; margin-bottom:12px;
+    }
+    .brand{ display:flex; align-items:center; gap:10px; }
+    .mark{
+      width:42px; height:42px; border-radius:14px;
+      background:
+        radial-gradient(circle at 30% 20%, rgba(46,167,255,.55), transparent 55%),
+        radial-gradient(circle at 80% 20%, rgba(253,186,24,.55), transparent 55%),
+        rgba(255,255,255,0.06);
+      border:1px solid rgba(255,255,255,0.12);
+      display:grid; place-items:center; overflow:hidden;
+    }
+    .mark img{ width:100%; height:100%; object-fit:cover; display:none; }
+    .title b{ display:block; letter-spacing:.06em; }
+    .title span{ color:var(--muted); font-size:12px; letter-spacing:.12em; text-transform:uppercase; }
+
+    .panel{
+      background: linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.04));
+      border: 1px solid var(--stroke);
+      border-radius: 18px;
+      padding: 14px;
+      backdrop-filter: blur(10px);
+    }
+
+    .grid2{ display:grid; grid-template-columns: 1fr 1fr; gap:10px; }
+    .grid3{ display:grid; grid-template-columns: 1fr 1fr 1fr; gap:10px; }
+    @media (max-width: 760px){
+      .grid2, .grid3{ grid-template-columns: 1fr; }
+      .top{ flex-direction:column; align-items:flex-start; }
+    }
+
+    .h{
+      margin: 6px 0 10px;
+      font-size: 13px;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.75);
+    }
+
+    .field{ display:flex; flex-direction:column; gap:6px; margin-bottom:10px; }
+    label{ font-size:12px; color: var(--muted); }
+    input, textarea, select{
+      width:100%;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.12);
+      color: var(--text);
+      padding: 10px 10px;
+      border-radius: 12px;
+      outline:none;
+      font-size: 14px;
+    }
+    textarea{ min-height: 86px; resize: vertical; line-height: 1.35; }
+
+    .toolbar{
+      display:flex; flex-wrap:wrap; gap:10px;
+      margin-top:12px;
+    }
+    .btn{
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(255,255,255,0.06);
+      color: var(--text);
+      padding: 10px 12px;
+      border-radius: 14px;
+      cursor:pointer;
+      font-weight: 800;
+      font-size: 13px;
+      display:flex;
+      align-items:center;
+      gap:8px;
+      user-select:none;
+    }
+    .btn.primary{
+      background: linear-gradient(135deg, rgba(46,167,255,.35), rgba(253,186,24,.28));
+      border-color: rgba(255,255,255,0.16);
+    }
+    .btn:hover{ filter: brightness(1.06); }
+
+    .hint{
+      margin-top:10px;
+      font-size:12px;
+      color: rgba(255,255,255,0.62);
+      line-height:1.35;
+    }
+    .status{
+      margin-top:10px;
+      font-size:12px;
+      color: rgba(255,255,255,0.80);
+      padding: 10px 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.10);
+      background: rgba(255,255,255,0.04);
+      display:none;
+    }
+
+    /* ===== Impressão sem preview: só aparece durante print ===== */
+    #printArea{ display:none; }
+    body.printing{
+      background:#fff !important;
+      color:#111 !important;
+    }
+    body.printing .wrap{ display:none !important; }
+    body.printing #printArea{ display:block !important; }
+
+    @media print{
+      body{ background:#fff !important; }
+      .wrap{ display:none !important; }
+      #printArea{ display:block !important; }
+      @page{ size:A4; margin:0; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <div class="top">
+      <div class="brand">
+        <div class="mark" title="Logo">
+          <img id="logoImg" alt="House Prime Solar Logo" />
+          <svg id="logoSvg" width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M12 2l9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9l9-7z" stroke="rgba(255,255,255,.85)" stroke-width="1.5"/>
+            <path d="M7.5 14.5h9l-1 6H8.5l-1-6z" stroke="rgba(253,186,24,.85)" stroke-width="1.5"/>
+            <path d="M9 14.5l.6 6M12 14.5l.2 6M15 14.5l-.6 6" stroke="rgba(46,167,255,.85)" stroke-width="1.2"/>
+          </svg>
+        </div>
+        <div class="title">
+          <b>HOUSE PRIME <span style="color:var(--brand)">SOLAR</span></b>
+          <span>Gerador de Proposta em PDF</span>
+        </div>
+      </div>
+
+      <div class="toolbar" style="margin:0">
+        <button class="btn primary" id="btnPdf">🧾 Gerar PDF</button>
+        <button class="btn" id="btnSave">💾 Salvar</button>
+        <button class="btn" id="btnLoad">📥 Carregar</button>
+        <button class="btn" id="btnBackup">⬇️ Backup (.json)</button>
+        <button class="btn" id="btnReset">♻️ Reset</button>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="h">Dados do Cliente</div>
+
+      <div class="grid2">
+        <div class="field">
+          <label>Nome do cliente</label>
+          <input id="clienteNome" value="Cliente Exemplo" />
+        </div>
+        <div class="field">
+          <label>Data da proposta</label>
+          <input id="dataProposta" />
+        </div>
+      </div>
+
+      <div class="grid2">
+        <div class="field">
+          <label>Endereço</label>
+          <input id="clienteEndereco" placeholder="Rua, número" />
+        </div>
+        <div class="field">
+          <label>Bairro</label>
+          <input id="clienteBairro" placeholder="Bairro" />
+        </div>
+      </div>
+
+      <div class="grid2">
+        <div class="field">
+          <label>Cidade</label>
+          <input id="clienteCidade" value="Sorocaba" />
+        </div>
+        <div class="field">
+          <label>Validade (dias)</label>
+          <input id="validadeDias" type="number" min="1" value="7" />
+        </div>
+      </div>
+
+      <div class="h">Sistema e Equipamentos</div>
+
+      <div class="grid2">
+        <div class="field">
+          <label>Tipo do sistema</label>
+          <select id="tipoSistema">
+            <option selected>Inversor (String)</option>
+            <option>Microinversor</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Descrição dos equipamentos (modelo/marca)</label>
+          <input id="descEquip" placeholder="Ex: 12x 550W • Inversor 6kW • Proteções DPS/Disj • Estrutura alumínio" />
+        </div>
+      </div>
+
+      <div class="grid3">
+        <div class="field">
+          <label>Qtde de módulos</label>
+          <input id="qtdMod" type="number" min="1" value="12" />
+        </div>
+        <div class="field">
+          <label>Potência do módulo (W)</label>
+          <input id="potMod" type="number" step="1" value="550" />
+        </div>
+        <div class="field">
+          <label>Área necessária (m²)</label>
+          <input id="areaNec" type="number" step="0.1" value="32" />
+        </div>
+      </div>
+
+      <div class="grid3">
+        <div class="field">
+          <label>Consumo médio (kWh/mês)</label>
+          <input id="consumoMedio" type="number" step="0.1" value="450" />
+        </div>
+        <div class="field">
+          <label>Tarifa (R$/kWh)</label>
+          <input id="tarifa" type="number" step="0.01" value="0.95" />
+        </div>
+        <div class="field">
+          <label>Geração estimada (kWh/mês)</label>
+          <input id="geracaoEst" type="number" step="1" value="420" />
+        </div>
+      </div>
+
+      <div class="grid2">
+        <div class="field">
+          <label>Tipo de ligação</label>
+          <select id="ligacao">
+            <option>Monofásica</option>
+            <option selected>Bifásica</option>
+            <option>Trifásica</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Prazo de instalação (dias)</label>
+          <input id="prazo" type="number" min="1" value="10" />
+        </div>
+      </div>
+
+      <div class="h">Valores</div>
+
+      <div class="grid3">
+        <div class="field">
+          <label>Preço módulo (R$) (custo)</label>
+          <input id="precoModuloCusto" type="number" step="1" value="350" />
+        </div>
+        <div class="field">
+          <label>Equipamentos + materiais (R$) (custo)</label>
+          <input id="equipMateriaisCusto" type="number" step="1" value="0" />
+        </div>
+        <div class="field">
+          <label>Mão de obra por módulo (R$)</label>
+          <input id="maoObraModulo" type="number" step="1" value="350" />
+        </div>
+      </div>
+
+      <div class="grid2">
+        <div class="field">
+          <label>Desloc./complex. (R$)</label>
+          <input id="ajuste" type="number" step="1" value="0" />
+        </div>
+        <div class="field">
+          <label>(Info) Total módulos (custo) — automático</label>
+          <input id="totalModsInfo" disabled />
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Observações (opcional)</label>
+        <textarea id="obs">• Equipamentos fornecidos a preço de custo (sem margem de revenda).
+• Instalação completa e segura, com foco em durabilidade e desempenho.
+• Ajustes de valor podem ocorrer por altura, tipo de telhado, acesso e distância.</textarea>
+      </div>
+
+      <div class="h">Contato / Identidade</div>
+
+      <div class="grid2">
+        <div class="field">
+          <label>WhatsApp</label>
+          <input id="whats" value="(15) 9 0000-0000" />
+        </div>
+        <div class="field">
+          <label>E-mail (opcional)</label>
+          <input id="email" value="contato@houseprimesolar.com.br" />
+        </div>
+      </div>
+
+      <div class="field">
+        <label>URL do logo (https) (opcional)</label>
+        <input id="logoUrl" placeholder="Cole o link do logo (PNG/JPG). Ex: https://..." />
+      </div>
+
+      <div id="status" class="status"></div>
+
+      <div class="hint">
+        <b>PDF:</b> Clique em <b>Gerar PDF</b> → selecione <b>Salvar como PDF</b>.<br/>
+        <b>Salvar:</b> Se o Google Sites bloquear, use o <b>Backup (.json)</b>.
+      </div>
+    </div>
+  </div>
+
+  <!-- Área de impressão (fica oculta; aparece só no print) -->
+  <div id="printArea"></div>
+
+  <script>
+    const STORAGE_KEY = "HPS_PROPOSTA_V3";
+    const $ = (id) => document.getElementById(id);
+
+    function brl(n){
+      const v = Number(n || 0);
+      return v.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+    function todayBR(){
+      const d = new Date();
+      const dd = String(d.getDate()).padStart(2,'0');
+      const mm = String(d.getMonth()+1).padStart(2,'0');
+      const yyyy = d.getFullYear();
+      return `${dd}/${mm}/${yyyy}`;
+    }
+
+    const fields = [
+      "clienteNome","clienteEndereco","clienteBairro","clienteCidade","dataProposta","validadeDias",
+      "tipoSistema","descEquip",
+      "qtdMod","potMod","areaNec","consumoMedio","tarifa","geracaoEst","ligacao","prazo",
+      "precoModuloCusto","equipMateriaisCusto","maoObraModulo","ajuste",
+      "obs","whats","email","logoUrl"
+    ];
+
+    function getData(){
+      const d = {};
+      fields.forEach(id => d[id] = $(id).value);
+      return d;
+    }
+
+    function setData(d){
+      fields.forEach(id => { if(d && d[id] !== undefined) $(id).value = d[id]; });
+      applyLogo();
+      refreshTotalsInfo();
+    }
+
+    function showStatus(msg){
+      const el = $("status");
+      el.style.display = "block";
+      el.textContent = msg;
+      setTimeout(()=>{ el.style.display = "none"; }, 2600);
+    }
+
+    function applyLogo(){
+      const url = ($("logoUrl").value || "").trim();
+      const img = $("logoImg");
+      const svg = $("logoSvg");
+      if(url.startsWith("http")){
+        img.src = url;
+        img.style.display = "block";
+        svg.style.display = "none";
+      } else {
+        img.removeAttribute("src");
+        img.style.display = "none";
+        svg.style.display = "block";
+      }
+    }
+
+    function refreshTotalsInfo(){
+      const qtd = Number($("qtdMod").value || 0);
+      const custoModulo = Number($("precoModuloCusto").value || 0);
+      const custoMods = qtd * custoModulo;
+      $("totalModsInfo").value = `R$ ${brl(custoMods)}`;
+    }
+
+    function buildPrintHTML(d){
+      const nome = (d.clienteNome || "Cliente").trim();
+      const endereco = (d.clienteEndereco || "").trim();
+      const bairro = (d.clienteBairro || "").trim();
+      const cidade = (d.clienteCidade || "").trim();
+      const data = (d.dataProposta || todayBR()).trim();
+      const validade = Number(d.validadeDias || 7);
+
+      const tipoSistema = (d.tipoSistema || "").trim();
+      const descEquip = (d.descEquip || "").trim();
+
+      const consumo = Number(d.consumoMedio || 0);
+      const tarifa = Number(d.tarifa || 0);
+      const geracao = Number(d.geracaoEst || 0);
+
+      const qtd = Number(d.qtdMod || 1);
+      const potW = Number(d.potMod || 0);
+      const area = Number(d.areaNec || 0);
+      const ligacao = d.ligacao || "";
+      const prazo = Number(d.prazo || 0);
+
+      const custoModulo = Number(d.precoModuloCusto || 0);
+      const equipMateriais = Number(d.equipMateriaisCusto || 0);
+      const maoPorMod = Number(d.maoObraModulo || 0);
+      const ajuste = Number(d.ajuste || 0);
+
+      const kwp = (qtd * potW) / 1000;
+
+      const custoMods = qtd * custoModulo;
+      const custoEquipTotal = custoMods + equipMateriais;
+
+      const maoTotal = qtd * maoPorMod;
+      const instalacaoTotal = maoTotal + ajuste;
+
+      const total = custoEquipTotal + instalacaoTotal;
+
+      const contaAtual = consumo * tarifa;
+      const ecoMensal = geracao * tarifa;
+      const payback = ecoMensal > 0 ? Math.round(total / ecoMensal) : 0;
+
+      const obs = (d.obs || "").replace(/\n/g,"<br/>");
+      const whats = d.whats || "";
+      const email = d.email || "";
+      const logoUrl = (d.logoUrl || "").trim();
+
+      return `
+      <div style="width:210mm; min-height:297mm; padding:16mm; font-family: Arial, Helvetica, sans-serif; color:#111; background:#fff;">
+        <div style="display:flex; justify-content:space-between; gap:12px; align-items:flex-start; border-bottom:1px solid #e5e5e5; padding-bottom:10px;">
+          <div style="display:flex; gap:10px; align-items:center;">
+            <div style="width:46px; height:46px; border-radius:12px; border:1px solid #ddd; overflow:hidden; display:grid; place-items:center;">
+              ${logoUrl.startsWith("http") ? `<img src="${logoUrl}" style="width:100%;height:100%;object-fit:cover" alt="Logo"/>` : `<span style="font-weight:800;">HPS</span>`}
+            </div>
+            <div>
+              <div style="font-weight:800; letter-spacing:.06em;">HOUSE PRIME <span style="color:#FDBA18;">SOLAR</span></div>
+              <div style="font-size:11px; color:#555; letter-spacing:.12em; text-transform:uppercase; margin-top:2px;">Proposta de Sistema Fotovoltaico</div>
+            </div>
+          </div>
+
+          <div style="text-align:right; font-size:12px; color:#333; line-height:1.35;">
+            <div><b>${nome}</b></div>
+            ${endereco ? `<div>${endereco}</div>` : ``}
+            ${(bairro || cidade) ? `<div>${bairro ? bairro + " • " : ""}${cidade}</div>` : ``}
+            <div><span style="color:#666">Data:</span> ${data}</div>
+            <div><span style="color:#666">Validade:</span> ${validade} dias</div>
+          </div>
+        </div>
+
+        <div style="margin-top:12px; padding:12px; border:1px solid #e6e6e6; border-radius:14px; background: linear-gradient(135deg, rgba(46,167,255,.10), rgba(253,186,24,.10));">
+          <div style="font-size:20px; font-weight:800; margin-bottom:6px;">Energia solar com transparência total.</div>
+          <div style="font-size:12.5px; color:#333; line-height:1.45;">
+            Na <b>House Prime Solar</b>, os <b>equipamentos são fornecidos a preço de custo</b> (sem margem de revenda).
+            Nosso lucro está na <b>instalação bem feita</b>: segura, organizada e feita para durar.
+          </div>
+          <div style="margin-top:10px; display:flex; flex-wrap:wrap; gap:8px;">
+            <div style="font-size:11px; border:1px solid #ddd; padding:6px 8px; border-radius:999px; background:#fff;">Equipamento a custo</div>
+            <div style="font-size:11px; border:1px solid #ddd; padding:6px 8px; border-radius:999px; background:#fff;">Instalação premium</div>
+            <div style="font-size:11px; border:1px solid #ddd; padding:6px 8px; border-radius:999px; background:#fff;">Projeto objetivo</div>
+            <div style="font-size:11px; border:1px solid #ddd; padding:6px 8px; border-radius:999px; background:#fff;">Suporte pós-venda</div>
+          </div>
+        </div>
+
+        <div style="margin-top:12px;">
+          <div style="font-size:12px; letter-spacing:.12em; text-transform:uppercase; color:#222; margin:0 0 8px;">Sistema Proposto</div>
+
+          <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:10px;">
+            <div style="border:1px solid #e6e6e6; border-radius:14px; padding:10px;">
+              <div style="display:flex; justify-content:space-between; align-items:flex-end;">
+                <div style="font-size:11px; color:#555;">Potência total</div>
+                <div style="font-size:14px; font-weight:800;">${kwp.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})} kWp</div>
+              </div>
+              <div style="font-size:11px; color:#555; margin-top:6px;">${qtd} módulos de ${potW}W</div>
+            </div>
+
+            <div style="border:1px solid #e6e6e6; border-radius:14px; padding:10px;">
+              <div style="display:flex; justify-content:space-between; align-items:flex-end;">
+                <div style="font-size:11px; color:#555;">Geração estimada</div>
+                <div style="font-size:14px; font-weight:800;">${Math.round(geracao)} kWh/mês</div>
+              </div>
+              <div style="font-size:11px; color:#555; margin-top:6px;">Ligação: <b>${ligacao}</b></div>
+            </div>
+
+            <div style="border:1px solid #e6e6e6; border-radius:14px; padding:10px;">
+              <div style="display:flex; justify-content:space-between; align-items:flex-end;">
+                <div style="font-size:11px; color:#555;">Área / Prazo</div>
+                <div style="font-size:14px; font-weight:800;">${area.toLocaleString('pt-BR',{maximumFractionDigits:1})} m²</div>
+              </div>
+              <div style="font-size:11px; color:#555; margin-top:6px;">Prazo: <b>${prazo} dias</b></div>
+            </div>
+          </div>
+
+          <div style="margin-top:10px; border:1px solid #e6e6e6; border-radius:14px; padding:10px;">
+            <div style="display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap;">
+              <div><b>Tipo:</b> ${tipoSistema}</div>
+              ${descEquip ? `<div style="color:#333;"><b>Descrição:</b> ${descEquip}</div>` : ``}
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-top:12px;">
+          <div style="font-size:12px; letter-spacing:.12em; text-transform:uppercase; color:#222; margin:0 0 8px;">Transparência de Valores</div>
+
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+            <div style="border:1px solid #e6e6e6; border-radius:14px; padding:10px;">
+              <div style="font-weight:800; margin-bottom:6px;">Equipamentos (preço de custo)</div>
+              <table style="width:100%; border-collapse:collapse; font-size:12px;">
+                <thead>
+                  <tr>
+                    <th style="text-align:left; font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:#222; padding:8px 8px; border-bottom:1px solid #ededed;">Item</th>
+                    <th style="text-align:right; font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:#222; padding:8px 8px; border-bottom:1px solid #ededed;">Valor</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td style="padding:8px 8px; border-bottom:1px solid #ededed;">Módulos solares <span style="color:#666">(custo)</span></td>
+                    <td style="padding:8px 8px; border-bottom:1px solid #ededed; text-align:right;">R$ ${brl(custoMods)}</td>
+                  </tr>
+                  <tr>
+                    <td style="padding:8px 8px; border-bottom:1px solid #ededed;">Equipamentos + materiais <span style="color:#666">(custo)</span></td>
+                    <td style="padding:8px 8px; border-bottom:1px solid #ededed; text-align:right;">R$ ${brl(equipMateriais)}</td>
+                  </tr>
+                  <tr>
+                    <td style="padding:8px 8px;"><b>Total equipamentos</b></td>
+                    <td style="padding:8px 8px; text-align:right;"><b>R$ ${brl(custoEquipTotal)}</b></td>
+                  </tr>
+                </tbody>
+              </table>
+              <div style="margin-top:8px; font-size:11.5px; color:#333; line-height:1.45;">
+                <b>Obs:</b> Equipamentos fornecidos sem margem de revenda (preço de custo).
+              </div>
+            </div>
+
+            <div style="border:1px solid #e6e6e6; border-radius:14px; padding:10px;">
+              <div style="font-weight:800; margin-bottom:6px;">Instalação (mão de obra)</div>
+              <table style="width:100%; border-collapse:collapse; font-size:12px;">
+                <thead>
+                  <tr>
+                    <th style="text-align:left; font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:#222; padding:8px 8px; border-bottom:1px solid #ededed;">Serviço</th>
+                    <th style="text-align:right; font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:#222; padding:8px 8px; border-bottom:1px solid #ededed;">Valor</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td style="padding:8px 8px; border-bottom:1px solid #ededed;">Mão de obra (${qtd} módulos)</td>
+                    <td style="padding:8px 8px; border-bottom:1px solid #ededed; text-align:right;">R$ ${brl(maoTotal)}</td>
+                  </tr>
+                  <tr>
+                    <td style="padding:8px 8px; border-bottom:1px solid #ededed;">Deslocamento / complexidade</td>
+                    <td style="padding:8px 8px; border-bottom:1px solid #ededed; text-align:right;">R$ ${brl(ajuste)}</td>
+                  </tr>
+                  <tr>
+                    <td style="padding:8px 8px;"><b>Total instalação</b></td>
+                    <td style="padding:8px 8px; text-align:right;"><b>R$ ${brl(instalacaoTotal)}</b></td>
+                  </tr>
+                </tbody>
+              </table>
+
+              <div style="margin-top:10px; border:1px solid #ededed; border-radius:14px; padding:10px;">
+                <div style="display:flex; justify-content:space-between; gap:10px; align-items:flex-end;">
+                  <div style="font-size:11px; color:#555;">Total estimado do projeto</div>
+                  <div style="font-size:16px; font-weight:800;">R$ ${brl(total)}</div>
+                </div>
+                <div style="font-size:11px; color:#555; margin-top:6px;">Total = equipamentos (custo) + instalação</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-top:12px;">
+          <div style="font-size:12px; letter-spacing:.12em; text-transform:uppercase; color:#222; margin:0 0 8px;">Economia Estimada</div>
+
+          <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:10px;">
+            <div style="border:1px solid #e6e6e6; border-radius:14px; padding:10px;">
+              <div style="display:flex; justify-content:space-between; align-items:flex-end;">
+                <div style="font-size:11px; color:#555;">Conta atual (estim.)</div>
+                <div style="font-size:14px; font-weight:800;">R$ ${brl(contaAtual)}</div>
+              </div>
+              <div style="font-size:11px; color:#555; margin-top:6px;">${Math.round(consumo)} kWh × tarifa</div>
+            </div>
+
+            <div style="border:1px solid #e6e6e6; border-radius:14px; padding:10px;">
+              <div style="display:flex; justify-content:space-between; align-items:flex-end;">
+                <div style="font-size:11px; color:#555;">Economia mensal (estim.)</div>
+                <div style="font-size:14px; font-weight:800;">R$ ${brl(ecoMensal)}</div>
+              </div>
+              <div style="font-size:11px; color:#555; margin-top:6px;">${Math.round(geracao)} kWh × tarifa</div>
+            </div>
+
+            <div style="border:1px solid #e6e6e6; border-radius:14px; padding:10px;">
+              <div style="display:flex; justify-content:space-between; align-items:flex-end;">
+                <div style="font-size:11px; color:#555;">Payback (estim.)</div>
+                <div style="font-size:14px; font-weight:800;">${payback ? payback : "—"} meses</div>
+              </div>
+              <div style="font-size:11px; color:#555; margin-top:6px;">Estimativa baseada no total e economia</div>
+            </div>
+          </div>
+
+          ${obs ? `<div style="margin-top:10px; border:1px solid #e6e6e6; border-radius:14px; padding:10px;">
+            <div style="font-weight:800; margin-bottom:6px;">Observações</div>
+            <div style="font-size:11.5px; color:#333; line-height:1.45;">${obs}</div>
+          </div>` : ``}
+        </div>
+
+        <div style="margin-top:14px; border-top:1px solid #e5e5e5; padding-top:10px; display:flex; justify-content:space-between; gap:12px; font-size:11px; color:#333;">
+          <div><b>House Prime Solar</b><br/>${whats}${email ? ` • ${email}` : ``}</div>
+          <div style="text-align:right">___________________________<br/><span style="color:#666">Assinatura do responsável</span></div>
+        </div>
+      </div>
+      `;
+    }
+
+    function renderPrintArea(){
+      const d = getData();
+      $("printArea").innerHTML = buildPrintHTML(d);
+    }
+
+    function generatePDF(){
+      try{
+        renderPrintArea();
+        document.body.classList.add("printing");
+        // Chamar print no mesmo contexto (mais compatível com Google Sites)
+        window.print();
+        // volta ao normal após o print
+        setTimeout(()=>{
+          document.body.classList.remove("printing");
+          $("printArea").innerHTML = "";
+        }, 600);
+      } catch(e){
+        showStatus("Falha ao gerar PDF. Se estiver no Google Sites, tente incorporar por URL.");
+      }
+    }
+
+    async function tryLocalSave(){
+      try{
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(getData()));
+        showStatus("Salvo neste navegador ✅");
+      } catch(e){
+        showStatus("Salvar bloqueado aqui. Use Backup (.json).");
+      }
+    }
+
+    async function tryLocalLoad(){
+      try{
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if(!raw){ showStatus("Nenhum salvamento encontrado."); return; }
+        setData(JSON.parse(raw));
+        showStatus("Carregado ✅");
+      } catch(e){
+        showStatus("Carregar bloqueado aqui. Use Backup (.json).");
+      }
+    }
+
+    function downloadBackup(){
+      const data = getData();
+      const blob = new Blob([JSON.stringify(data, null, 2)], {type:"application/json"});
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = `proposta-house-prime-solar-${(data.clienteNome||"cliente").replace(/\s+/g,"-").toLowerCase()}.json`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(a.href);
+      showStatus("Backup baixado ✅");
+    }
+
+    function resetAll(){
+      if(!confirm("Resetar todos os campos?")) return;
+      try{ localStorage.removeItem(STORAGE_KEY); }catch(e){}
+      location.reload();
+    }
+
+    function init(){
+      $("dataProposta").value = todayBR();
+      refreshTotalsInfo();
+      applyLogo();
+
+      // atualizações automáticas do total de módulos
+      $("qtdMod").addEventListener("input", refreshTotalsInfo);
+      $("precoModuloCusto").addEventListener("input", refreshTotalsInfo);
+      $("logoUrl").addEventListener("input", applyLogo);
+
+      $("btnPdf").addEventListener("click", generatePDF);
+      $("btnSave").addEventListener("click", tryLocalSave);
+      $("btnLoad").addEventListener("click", tryLocalLoad);
+      $("btnBackup").addEventListener("click", downloadBackup);
+      $("btnReset").addEventListener("click", resetAll);
+    }
+
+    init();
+  </script>
+</body>
+</html>
